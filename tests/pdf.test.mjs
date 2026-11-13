@@ -1,0 +1,23 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import '../vendor/jspdf.umd.min.js';
+import {createReviewPDF} from '../pdf.js';
+import {blankReview} from '../storage.js';
+import {sections,ratings} from '../criteria.js';
+const assets=['DejaVuSans.ttf','DejaVuSans-Bold.ttf','logo.jpg'].map(f=>new Uint8Array(readFileSync(new URL('../assets/'+f,import.meta.url))));
+const swimmer={firstName:'Élodie',lastName:'O’Neill',group:'Browns'};
+test('PDF is produced entirely from bundled assets with portrait phone pages',async()=>{
+  const review=blankReview('qa');review.date='2026-11-13';
+  for(const s of sections)review.answers[s.id]={rating:ratings[s.id%5].label,comments:s.presets[0]?.replaceAll('[Name]','Élodie')||''};
+  const result=await createReviewPDF(swimmer,review,{assets});
+  assert.equal(result.blob.type,'application/pdf');assert.ok(result.pages>=4);
+  assert.equal(result.filename,'Aquabears-Élodie-O’Neill-2026-11-13.pdf');
+  const bytes=Buffer.from(await result.blob.arrayBuffer());
+  assert.match(bytes.toString('latin1'),/^%PDF-/);assert.match(bytes.toString('latin1'),/\/MediaBox \[0 0 390\. 844\.\]/);
+  assert.match(bytes.toString('latin1'),/\/FontFile2/);
+  const whitespace={...review,remedial:' \n\t '};
+  const omitted=await createReviewPDF(swimmer,whitespace,{assets});assert.equal(omitted.pages,result.pages);
+  const extended=await createReviewPDF(swimmer,{...review,remedial:'A clear plan for the next session.\n\n'.repeat(100)},{assets});
+  assert.ok(extended.pages>result.pages,'Long comments must add pages instead of clipping');
+});

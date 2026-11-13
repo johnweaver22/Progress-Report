@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#d71920">
+  <meta name="description" content="Aquabears coach reviews. Save swimmers, review development and create phone-friendly PDFs, online or offline.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Aquabears Review">
+  <title>Aquabears | Swimmer Development Review</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/png" href="./assets/icon-192.png">
+  <link rel="apple-touch-icon" href="./assets/icon-180.png">
+  <link rel="stylesheet" href="./styles.css">
+  <script defer src="./vendor/jspdf.umd.min.js"></script>
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to review</a>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo-frame"><img src="./assets/logo.png" alt="Aquabears of Rochdale" width="62" height="71"></div>
+      <div><div class="eyebrow">Aquabears of Rochdale</div><h1>Swimmer Development Review</h1><p>Coach workspace</p></div>
+    </div>
+    <div class="header-actions">
+      <button class="button secondary" id="manage-button" type="button">＋ Add swimmer</button>
+      <button class="button primary" id="pdf-button" type="button" disabled>Generate PDF <span aria-hidden="true">↗</span></button>
+    </div>
+  </header>
+  <div class="utility-bar">
+    <span id="offline-status" class="connection" role="status">Preparing offline use…</span>
+    <div class="utility-actions"><button id="update-button" type="button" hidden>Update ready · Apply update</button><button id="install-button" type="button">Install app</button></div>
+  </div>
+  <main id="main" tabindex="-1">
+    <div id="error-banner" class="message error" role="alert" hidden><span id="error-text"></span><button id="reload-review" type="button" hidden>Reopen saved review</button></div>
+    <div id="notice" class="message notice" role="status" hidden></div>
+    <section id="empty-view" class="empty-state" hidden>
+      <span class="empty-mark" aria-hidden="true">＋</span>
+      <p class="eyebrow">Ready when you are</p><h2>Add your first swimmer</h2>
+      <p>Save their name and group, then work through Training, Performance and the Aquabears Creed.</p>
+      <button id="first-swimmer" type="button" class="button primary">Add swimmer</button>
+      <p class="small">Swimmers stay saved on this device. Reviews clear after five days.</p>
+    </section>
+    <section id="review-view" hidden aria-label="Swimmer review">
+      <div class="review-overview">
+        <div class="swimmer-field"><label for="swimmer-select">Swimmer</label><select id="swimmer-select"></select></div>
+        <div class="date-field"><label for="review-date">Review date</label><input type="date" id="review-date" required></div>
+        <div class="progress-block"><span id="progress-text">0 of 11 assessed</span><progress id="progress" max="11" value="0" aria-label="Subsections assessed"></progress></div>
+      </div>
+      <div id="group-target" class="target"><strong>Group target</strong><p id="target-text"></p></div>
+      <div class="review-layout">
+        <nav class="section-navigation" id="section-nav" aria-label="Review subsections"></nav>
+        <div class="editor-wrap">
+          <div class="mobile-section"><label for="section-select">Review subsection</label><select id="section-select"></select></div>
+          <article class="editor-card">
+            <div class="card-heading"><span id="section-group" class="eyebrow"></span><span id="step-count" class="step-count"></span></div>
+            <h2 id="section-title" tabindex="-1"></h2>
+            <p id="section-note" class="standard-note"></p>
+            <div id="rating-field" class="field"><label for="rating-select">Rating</label><select id="rating-select" aria-describedby="rating-meaning"></select><p id="rating-meaning" class="help"></p></div>
+            <div id="preset-field" class="field"><label for="preset-select">Quick comment</label><select id="preset-select" aria-describedby="preset-help"></select><p id="preset-help" class="help">Choose to add a comment. You can edit it or add another.</p></div>
+            <div class="field"><div class="label-row"><label for="comments" id="comments-label">Coach comments</label><span class="optional">Optional</span></div><textarea id="comments" rows="7" maxlength="12000" placeholder="Write your comments…" aria-describedby="comments-help"></textarea><p id="comments-help" class="help"></p></div>
+            <div class="editor-footer"><button id="previous-button" type="button" class="button secondary">← Previous</button><span id="save-status" class="save-status" role="status">Ready</span><button id="next-button" type="button" class="button primary">Next <span aria-hidden="true">→</span></button></div>
+          </article>
+          <div class="retention-row"><span id="retention-text" class="small"></span><button id="clear-review" class="text-button" type="button">Clear review</button></div>
+        </div>
+      </div>
+    </section>
+    <section id="swimmers-view" hidden aria-labelledby="manager-title">
+      <div class="page-heading"><div><p class="eyebrow">Swimmer management</p><h2 id="manager-title">Add swimmer</h2></div><button id="back-button" class="button secondary" type="button">← Back to review</button></div>
+      <div class="manager-layout">
+        <form id="swimmer-form" class="panel">
+          <div class="field"><label for="first-name">First name</label><input id="first-name" name="given-name" autocomplete="given-name" maxlength="80" required></div>
+          <div class="field"><label for="last-name">Last name</label><input id="last-name" name="family-name" autocomplete="family-name" maxlength="80" required></div>
+          <div class="field"><label for="swimmer-group">Group</label><select id="swimmer-group" required></select><p id="form-target" class="help"></p></div>
+          <div class="form-actions"><button id="save-swimmer" type="submit" class="button primary">Save swimmer</button><button id="cancel-edit" type="button" class="button secondary">Clear</button></div>
+          <p id="form-message" class="help" role="status"></p>
+        </form>
+        <div class="panel roster-panel"><div class="roster-heading"><h3>Saved swimmers</h3><span id="swimmer-count" class="count"></span></div><div id="swimmer-list"></div><p class="help">Names and groups stay saved until you delete them. Reviews clear after five days.</p></div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer"><span>Aquabears · Progress in every part of swimming</span><span>Saved on this device · v1.0.0</span></footer>
+  <dialog id="confirm-dialog" aria-labelledby="confirm-title"><div class="dialog-inner"><h2 id="confirm-title"></h2><p id="confirm-message"></p><div class="dialog-actions"><button id="confirm-cancel" class="button secondary" type="button">Cancel</button><button id="confirm-ok" class="button danger" type="button">Delete swimmer</button></div></div></dialog>
+  <dialog id="pdf-dialog" aria-labelledby="pdf-title"><div class="dialog-inner"><div class="dialog-heading"><h2 id="pdf-title">Swimmer PDF</h2><button id="pdf-close" class="icon-button" aria-label="Close PDF options" type="button">×</button></div><p id="pdf-message" role="status">Preparing your PDF…</p><div class="pdf-ready" id="pdf-ready" hidden><span class="document-icon" aria-hidden="true">PDF</span><p id="pdf-filename"></p><div class="dialog-actions"><a id="pdf-download" class="button primary">Download PDF</a><a id="pdf-open" class="button secondary" target="_blank" rel="noopener">Open PDF</a><button id="pdf-share" class="button secondary" type="button" hidden>Share PDF</button></div></div><p class="help">Formatted for scrolling on a phone. Downloaded PDFs stay saved until you delete them.</p></div></dialog>
+  <dialog id="install-dialog" aria-labelledby="install-title"><div class="dialog-inner"><div class="dialog-heading"><h2 id="install-title">Install Aquabears Review</h2><button id="install-close" class="icon-button" aria-label="Close install instructions" type="button">×</button></div><div id="install-instructions"></div><p class="help">Open the app online once and wait for “Offline ready”. You can then review swimmers and create PDFs without a connection.</p></div></dialog>
+  <noscript><p class="message error">Enable JavaScript to use Aquabears Review. Your browser can then save reviews and run the app offline.</p></noscript>
+</body>
+</html>
